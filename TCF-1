@@ -26,9 +26,7 @@ import {
   Tooltip, 
   ResponsiveContainer, 
   AreaChart, 
-  Area,
-  BarChart,
-  Bar
+  Area
 } from 'recharts';
 
 // --- MOCK DATA ---
@@ -89,14 +87,13 @@ const Metric = ({ label, value, trend, suffix = "" }) => (
 
 const App = () => {
   const [isNightMode, setIsNightMode] = useState(true);
-  
   const totalScore = 74;
   
   return (
     <div className={`min-h-screen ${isNightMode ? 'bg-[#020617] text-slate-200' : 'bg-slate-50 text-slate-900'} transition-all duration-700 flex font-sans antialiased`}>
       
-      {/* Premium Side Nav */}
-      <aside className="w-24 border-r border-slate-800/50 flex flex-col items-center py-10 gap-10 bg-slate-950/50 backdrop-blur-md sticky top-0 h-screen">
+      {/* Sidebar Nav */}
+      <aside className="w-24 border-r border-slate-800/50 flex flex-col items-center py-10 gap-10 bg-slate-950/50 backdrop-blur-md sticky top-0 h-screen hidden md:flex">
         <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-600/40">
           <Shield className="text-white" size={28} />
         </div>
@@ -115,33 +112,32 @@ const App = () => {
         </div>
       </aside>
 
-      {/* Main Content Area */}
-      <main className="flex-1 p-10 max-w-[1600px] mx-auto w-full">
+      {/* Main Content */}
+      <main className="flex-1 p-6 md:p-10 max-w-[1600px] mx-auto w-full">
         
-        {/* Top Business Bar */}
-        <header className="flex justify-between items-center mb-12">
+        {/* Header */}
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
           <div>
             <div className="flex items-center gap-3 mb-2">
               <span className="bg-emerald-500/10 text-emerald-500 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-500/20">Active Season</span>
               <span className="text-slate-600 text-[10px] font-bold uppercase tracking-widest">TFC Group Dashboard</span>
             </div>
-            <h1 className="text-5xl font-black text-white tracking-tighter">Azure Grand Resort <span className="text-slate-700 font-light">&amp; Spa</span></h1>
+            <h1 className="text-4xl md:text-5xl font-black text-white tracking-tighter">Azure Grand Resort <span className="text-slate-700 font-light">&amp; Spa</span></h1>
           </div>
-          <div className="flex gap-4">
-            <div className="text-right px-6 border-r border-slate-800">
+          <div className="flex gap-4 w-full md:w-auto">
+            <div className="hidden sm:block text-right px-6 border-r border-slate-800">
               <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Portfolio Status</p>
               <p className="text-white font-black text-xl">Top 5%</p>
             </div>
-            <button className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-2xl font-black text-sm shadow-2xl shadow-blue-600/20 transition-all active:scale-95">
+            <button className="flex-1 md:flex-none bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-2xl font-black text-sm shadow-2xl shadow-blue-600/20 transition-all active:scale-95">
               DOWNLOAD ESG REPORT
             </button>
           </div>
         </header>
 
-        {/* Business Intelligence Row */}
+        {/* Top Metrics Grid */}
         <div className="grid grid-cols-12 gap-6 mb-8">
           
-          {/* Executive Summary */}
           <Card className="col-span-12 lg:col-span-5 bg-gradient-to-br from-slate-900 to-slate-950">
             <div className="flex justify-between items-start mb-8">
               <div className="flex flex-col gap-1">
@@ -171,9 +167,8 @@ const App = () => {
             </div>
           </Card>
 
-          {/* Revenue & Impact Correlation */}
           <Card className="col-span-12 lg:col-span-7" title="Eco-Performance Correlation" subtitle="Monthly Revenue Impact vs. Conservation Compliance">
-            <div className="h-[240px] w-full">
+            <div className="h-[240px] w-full mt-4">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={REVENUE_DATA} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
@@ -194,11 +189,10 @@ const App = () => {
           </Card>
         </div>
 
-        {/* Audit & Operations Grid */}
+        {/* Secondary Detail Grid */}
         <div className="grid grid-cols-12 gap-6">
           
-          {/* Dimension Matrix */}
-          <div className="col-span-12 lg:col-span-8 grid grid-cols-3 gap-6">
+          <div className="col-span-12 lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {DIMENSIONS.map((dim) => (
               <Card key={dim.id} className="group cursor-pointer">
                 <div className="flex items-center gap-4 mb-4">
@@ -220,7 +214,6 @@ const App = () => {
             ))}
           </div>
 
-          {/* Audit Timeline */}
           <Card className="col-span-12 lg:col-span-4" title="Audit & Verification" icon={ClipboardCheck}>
             <div className="space-y-6">
               {AUDIT_TIMELINE.map((item, i) => (
@@ -239,21 +232,21 @@ const App = () => {
                 </div>
               ))}
             </div>
-            <button className="w-full mt-4 py-3 bg-slate-800/50 hover:bg-slate-800 rounded-xl text-xs font-black text-slate-300 tracking-widest transition-all">
-              VIEW HISTORICAL DATA
+            <button className="w-full mt-4 py-3 bg-slate-800/50 hover:bg-slate-800 rounded-xl text-xs font-black text-slate-300 tracking-widest transition-all uppercase">
+              View Historical Reports
             </button>
           </Card>
 
-          {/* Commercial CTA */}
-          <Card className="col-span-12 bg-gradient-to-r from-blue-700 to-indigo-900 border-none p-12 overflow-hidden relative group">
+          {/* CTA Section */}
+          <Card className="col-span-12 bg-gradient-to-r from-blue-700 to-indigo-900 border-none p-8 md:p-12 overflow-hidden relative group">
             <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
             <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-10">
-              <div className="max-w-xl">
-                <div className="flex items-center gap-2 mb-4">
+              <div className="max-w-xl text-center md:text-left">
+                <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
                   <Zap size={20} className="text-amber-400 fill-amber-400" />
-                  <span className="text-amber-400 font-black text-[10px] uppercase tracking-[0.3em]">Growth Accelerator</span>
+                  <span className="text-amber-400 font-black text-[10px] uppercase tracking-[0.3em]">Commercial Growth</span>
                 </div>
-                <h3 className="text-5xl font-black text-white tracking-tighter mb-4 leading-tight">Sync your impact with <br />Global Booking Engines.</h3>
+                <h3 className="text-4xl md:text-5xl font-black text-white tracking-tighter mb-4 leading-tight">Sync your impact with <br />Global Sales Engines.</h3>
                 <p className="text-blue-100/70 text-lg font-medium leading-relaxed">
                   Hotels at "Leadership" tier receive priority placement on Expedia and Booking.com eco-filters. Turn your conservation efforts into a high-conversion sales tool.
                 </p>
@@ -269,8 +262,11 @@ const App = () => {
             </div>
             <Award size={400} className="absolute -bottom-24 -right-24 text-white/5 rotate-12 pointer-events-none group-hover:scale-110 transition-transform duration-1000" />
           </Card>
-
         </div>
+
+        <footer className="mt-16 text-center text-slate-600 text-[10px] font-bold uppercase tracking-widest pb-10">
+          © 2024 Turtle Friendly Certification Ecosystem • Powered by TFC Data Hub
+        </footer>
       </main>
     </div>
   );
