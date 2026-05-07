@@ -1,304 +1,262 @@
-import React, { useState } from 'react';
-import { 
-  Shield, 
-  Moon, 
-  Sun, 
-  Camera, 
-  ClipboardCheck, 
-  BarChart3, 
-  Waves, 
-  FileText,
-  TrendingUp,
-  Globe,
-  Award,
-  Zap,
-  Users,
-  LayoutDashboard,
-  Target,
-  ArrowUpRight
-} from 'lucide-react';
-import { 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer, 
-  AreaChart, 
-  Area
-} from 'recharts';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Turtle Friendly Certification Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: #020617; }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: #020617 !important; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
 
-// --- BUSINESS DATA ENGINE ---
-const DIMENSIONS = [
-  { id: 'd1', name: 'Habitat Protection', weight: 30, score: 65, color: '#3b82f6', icon: Waves },
-  { id: 'd2', name: 'Infrastructure', weight: 20, score: 85, color: '#10b981', icon: Shield },
-  { id: 'd3', name: 'Guest Experience', weight: 15, score: 40, color: '#f59e0b', icon: Camera },
-  { id: 'd4', name: 'Community', weight: 15, score: 20, color: '#8b5cf6', icon: ClipboardCheck },
-  { id: 'd5', name: 'Data & Monitoring', weight: 10, score: 90, color: '#ec4899', icon: BarChart3 },
-  { id: 'd6', name: 'ESG Governance', weight: 10, score: 100, color: '#06b6d4', icon: FileText },
-];
+  <script type="text/babel">
+    const { useMemo, useState } = React;
 
-const PERFORMANCE_TREND = [
-  { month: 'Jan', revenue: 4200, compliance: 45 },
-  { month: 'Feb', revenue: 4500, compliance: 48 },
-  { month: 'Mar', revenue: 5100, compliance: 55 },
-  { month: 'Apr', revenue: 5900, compliance: 62 },
-  { month: 'May', revenue: 7800, compliance: 71 },
-  { month: 'Jun', revenue: 8400, compliance: 74 },
-];
+    const ICONS = {
+      Shield: '🛡️',
+      Camera: '📷',
+      ClipboardCheck: '✅',
+      BarChart3: '📊',
+      Waves: '🌊',
+      FileText: '📄',
+      TrendingUp: '📈',
+      Globe: '🌍',
+      Award: '🏆',
+      Zap: '⚡',
+      Users: '👥',
+      LayoutDashboard: '▦',
+      Target: '◎',
+      ArrowUpRight: '↗',
+      HelpCircle: '?',
+      Menu: '☰',
+      X: '×',
+    };
 
-const AUDIT_LOG = [
-  { status: 'completed', title: 'Q2 Lighting Audit', date: 'May 14', user: 'Verified Auditor' },
-  { status: 'pending', title: 'Nesting Monitoring', date: 'Tonight', user: 'Beach Ops' },
-  { status: 'upcoming', title: 'Staff Training', date: 'Jun 05', user: 'HR Director' },
-];
+    const DIMENSIONS = [
+      { id: 'd1', name: 'Habitat Protection', weight: 30, score: 65, color: '#3b82f6', icon: 'Waves' },
+      { id: 'd2', name: 'Infrastructure', weight: 20, score: 85, color: '#10b981', icon: 'Shield' },
+      { id: 'd3', name: 'Guest Experience', weight: 15, score: 40, color: '#f59e0b', icon: 'Camera' },
+      { id: 'd4', name: 'Community', weight: 15, score: 20, color: '#8b5cf6', icon: 'ClipboardCheck' },
+      { id: 'd5', name: 'Data & Monitoring', weight: 10, score: 90, color: '#ec4899', icon: 'BarChart3' },
+      { id: 'd6', name: 'ESG Governance', weight: 10, score: 100, color: '#06b6d4', icon: 'FileText' },
+    ];
 
-// --- REUSABLE UI COMPONENTS ---
+    const PERFORMANCE_TREND = [
+      { month: 'Jan', revenue: 4200, compliance: 45 },
+      { month: 'Feb', revenue: 4500, compliance: 48 },
+      { month: 'Mar', revenue: 5100, compliance: 55 },
+      { month: 'Apr', revenue: 5900, compliance: 62 },
+      { month: 'May', revenue: 7800, compliance: 71 },
+      { month: 'Jun', revenue: 8400, compliance: 74 },
+    ];
 
-const GlassCard = ({ children, className = "", title, subtitle, icon: Icon, badge }) => (
-  <div className={`bg-[#0f172a]/80 border border-slate-800 rounded-2xl p-5 shadow-xl transition-all hover:border-blue-500/50 ${className}`}>
-    {(title || Icon) && (
-      <div className="flex justify-between items-start mb-4">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-             {Icon && <Icon size={16} className="text-blue-400" />}
-             <h3 className="text-white font-bold text-sm tracking-tight">{title}</h3>
-          </div>
-          {subtitle && <p className="text-slate-500 text-[10px] font-medium leading-tight">{subtitle}</p>}
-        </div>
-        {badge && <span className="text-[9px] font-black bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/20 uppercase tracking-widest">{badge}</span>}
-      </div>
-    )}
-    {children}
-  </div>
-);
+    const AUDIT_LOG = [
+      { id: 'a1', status: 'completed', title: 'Q2 Lighting Audit', date: 'May 14', user: 'Verified Auditor' },
+      { id: 'a2', status: 'pending', title: 'Nesting Monitoring', date: 'Tonight', user: 'Beach Ops' },
+      { id: 'a3', status: 'upcoming', title: 'Staff Training', date: 'Jun 05', user: 'HR Director' },
+    ];
 
-const KPIMetric = ({ label, value, trend, suffix = "" }) => (
-  <div className="flex flex-col">
-    <span className="text-slate-500 text-[9px] font-black uppercase tracking-widest mb-1">{label}</span>
-    <div className="flex items-baseline gap-1.5">
-      <span className="text-xl font-black text-white">{value}{suffix}</span>
-      {trend && (
-        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${trend > 0 ? 'text-emerald-400 bg-emerald-400/5' : 'text-rose-400 bg-rose-400/5'}`}>
-          {trend > 0 ? '+' : ''}{trend}%
-        </span>
-      )}
-    </div>
-  </div>
-);
+    const NAV_ITEMS = [
+      { id: 'overview', label: 'Overview', icon: 'LayoutDashboard' },
+      { id: 'targets', label: 'Targets', icon: 'Target' },
+      { id: 'analytics', label: 'Analytics', icon: 'BarChart3' },
+      { id: 'market', label: 'Market', icon: 'Globe' },
+      { id: 'team', label: 'Team', icon: 'Users' },
+    ];
 
-const App = () => {
-  const [activeTab, setActiveTab] = useState('overview');
-  
-  return (
-    <div className="min-h-screen bg-[#020617] text-slate-200 font-sans selection:bg-blue-500/30">
-      
-      {/* Structural Wrapper - No Fixed Overlays to ensure visibility */}
-      <div className="flex flex-col md:flex-row min-h-screen">
-        
-        {/* Navigation Sidebar */}
-        <nav className="w-full md:w-20 bg-[#0f172a] border-b md:border-b-0 md:border-r border-slate-800 flex md:flex-col items-center py-4 md:py-8 gap-6 md:gap-10">
-          <div className="px-4 md:px-0">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20">
-              <Shield className="text-white" size={20} />
+    function Icon({ name, className = '' }) {
+      return <span className={`inline-flex h-5 w-5 items-center justify-center leading-none ${className}`} aria-hidden="true">{ICONS[name] || '•'}</span>;
+    }
+
+    function getScoreStatus(score) {
+      if (score >= 90) return { label: 'Excellent', color: 'text-emerald-400' };
+      if (score >= 70) return { label: 'Strong', color: 'text-blue-400' };
+      if (score >= 50) return { label: 'Improving', color: 'text-amber-400' };
+      return { label: 'Critical Gap', color: 'text-rose-400' };
+    }
+
+    function calculateWeightedScore(dimensions) {
+      const totalWeight = dimensions.reduce((sum, dimension) => sum + Number(dimension.weight || 0), 0);
+      if (totalWeight <= 0) return 0;
+      return dimensions.reduce((sum, dimension) => {
+        const score = Math.max(0, Math.min(100, Number(dimension.score || 0)));
+        const weight = Math.max(0, Number(dimension.weight || 0));
+        return sum + score * weight;
+      }, 0) / totalWeight;
+    }
+
+    function formatScoreParts(score) {
+      const safeScore = Number.isFinite(score) ? score : 0;
+      const [integerPart, decimalPart = '0'] = safeScore.toFixed(1).split('.');
+      return { integerPart, decimalPart };
+    }
+
+    function GlassCard({ children, className = '', title, subtitle, icon, badge }) {
+      return (
+        <section className={`rounded-2xl border border-slate-800 bg-slate-950/80 p-5 shadow-xl transition-all hover:border-blue-500/50 ${className}`}>
+          {(title || icon || badge) ? (
+            <div className="mb-4 flex items-start justify-between gap-4">
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  {icon ? <Icon name={icon} className="text-blue-400" /> : null}
+                  {title ? <h3 className="text-sm font-bold tracking-tight text-white">{title}</h3> : null}
+                </div>
+                {subtitle ? <p className="max-w-xl text-xs font-medium leading-snug text-slate-500">{subtitle}</p> : null}
+              </div>
+              {badge ? (
+                <span className="rounded-full border border-blue-500/20 bg-blue-500/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-blue-400">
+                  {badge}
+                </span>
+              ) : null}
             </div>
+          ) : null}
+          {children}
+        </section>
+      );
+    }
+
+    function KPIMetric({ label, value, trend, suffix = '' }) {
+      const hasTrend = typeof trend === 'number' && Number.isFinite(trend);
+      const isPositive = hasTrend ? trend >= 0 : false;
+
+      return (
+        <div className="flex flex-col">
+          <span className="mb-1 text-[9px] font-black uppercase tracking-widest text-slate-500">{label}</span>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-xl font-black text-white">{value}{suffix}</span>
+            {hasTrend ? (
+              <span className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold ${isPositive ? 'bg-emerald-400/5 text-emerald-400' : 'bg-rose-400/5 text-rose-400'}`}>
+                {isPositive ? '+' : ''}{trend}%
+              </span>
+            ) : null}
           </div>
-          <div className="flex md:flex-col gap-6 flex-1 justify-center md:justify-start">
-            {[LayoutDashboard, Target, BarChart3, Globe, Users].map((Icon, i) => (
-              <button key={i} className={`p-2.5 rounded-xl transition-all ${i === 0 ? 'text-white bg-slate-800 shadow-md' : 'text-slate-600 hover:text-blue-400'}`}>
-                <Icon size={20} />
-              </button>
+        </div>
+      );
+    }
+
+    function SimpleAreaChart({ data }) {
+      const width = 760;
+      const height = 280;
+      const padding = { top: 24, right: 28, bottom: 36, left: 48 };
+      const maxRevenue = Math.max(...data.map((d) => d.revenue));
+      const minRevenue = Math.min(...data.map((d) => d.revenue));
+      const maxCompliance = 100;
+
+      const x = (index) => padding.left + (index * (width - padding.left - padding.right)) / (data.length - 1);
+      const yRevenue = (value) => padding.top + ((maxRevenue - value) / (maxRevenue - minRevenue || 1)) * (height - padding.top - padding.bottom);
+      const yCompliance = (value) => padding.top + ((maxCompliance - value) / maxCompliance) * (height - padding.top - padding.bottom);
+
+      const revenuePoints = data.map((d, i) => `${x(i)},${yRevenue(d.revenue)}`).join(' ');
+      const compliancePoints = data.map((d, i) => `${x(i)},${yCompliance(d.compliance)}`).join(' ');
+      const areaPoints = `${padding.left},${height - padding.bottom} ${revenuePoints} ${width - padding.right},${height - padding.bottom}`;
+
+      return (
+        <div className="h-[280px] w-full overflow-hidden">
+          <svg viewBox={`0 0 ${width} ${height}`} className="h-full w-full" role="img" aria-label="Eco revenue and compliance trend chart">
+            <defs>
+              <linearGradient id="revenueFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#3b82f6" stopOpacity="0.40" />
+                <stop offset="95%" stopColor="#3b82f6" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+
+            {[0, 1, 2, 3].map((line) => {
+              const y = padding.top + line * ((height - padding.top - padding.bottom) / 3);
+              return <line key={line} x1={padding.left} x2={width - padding.right} y1={y} y2={y} stroke="#1e293b" strokeDasharray="3 3" />;
+            })}
+
+            <polygon points={areaPoints} fill="url(#revenueFill)" />
+            <polyline points={revenuePoints} fill="none" stroke="#3b82f6" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+            <polyline points={compliancePoints} fill="none" stroke="#10b981" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+
+            {data.map((d, i) => (
+              <g key={d.month}>
+                <text x={x(i)} y={height - 12} textAnchor="middle" fill="#64748b" fontSize="12" fontWeight="700">{d.month}</text>
+                <circle cx={x(i)} cy={yRevenue(d.revenue)} r="4" fill="#3b82f6" />
+                <circle cx={x(i)} cy={yCompliance(d.compliance)} r="4" fill="#10b981" />
+              </g>
             ))}
-          </div>
-          <div className="hidden md:flex flex-col gap-6 mt-auto px-4">
-             <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700"></div>
+
+            <text x={padding.left} y="16" fill="#64748b" fontSize="11" fontWeight="800">Revenue</text>
+            <text x={width - padding.right} y="16" fill="#64748b" fontSize="11" fontWeight="800" textAnchor="end">Compliance</text>
+          </svg>
+        </div>
+      );
+    }
+
+    function Sidebar({ activeTab, setActiveTab }) {
+      const [isOpen, setIsOpen] = useState(false);
+
+      return (
+        <nav className="no-print relative border-b border-slate-800 bg-slate-950 md:min-h-screen md:w-24 md:border-b-0 md:border-r" aria-label="Primary navigation">
+          <div className="flex items-center justify-between p-4 md:min-h-screen md:flex-col md:gap-10 md:px-0 md:py-8">
+            <div className="flex items-center gap-3 md:flex-col">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 shadow-lg shadow-blue-600/20">
+                <Icon name="Shield" />
+              </div>
+              <span className="text-xs font-black uppercase tracking-widest text-white md:hidden">TFC Hub</span>
+            </div>
+
+            <button
+              type="button"
+              className="rounded-xl border border-slate-800 p-2 text-slate-300 md:hidden"
+              aria-expanded={isOpen}
+              aria-label="Toggle navigation menu"
+              onClick={() => setIsOpen((value) => !value)}
+            >
+              <Icon name={isOpen ? 'X' : 'Menu'} />
+            </button>
+
+            <div className={`${isOpen ? 'absolute left-0 right-0 top-full z-20 grid bg-slate-950 p-4 shadow-xl' : 'hidden'} gap-3 md:static md:z-auto md:flex md:flex-1 md:flex-col md:bg-transparent md:p-0 md:shadow-none`}>
+              {NAV_ITEMS.map(({ id, label, icon }) => {
+                const selected = activeTab === id;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    className={`flex items-center gap-3 rounded-xl p-3 text-left text-sm font-bold transition-all md:justify-center ${selected ? 'bg-slate-800 text-white shadow-md' : 'text-slate-500 hover:bg-slate-900 hover:text-blue-400'}`}
+                    aria-current={selected ? 'page' : undefined}
+                    onClick={() => {
+                      setActiveTab(id);
+                      setIsOpen(false);
+                    }}
+                  >
+                    <Icon name={icon} />
+                    <span className="md:sr-only">{label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="hidden md:mt-auto md:flex md:flex-col md:gap-6">
+              <div className="h-8 w-8 rounded-full border border-slate-700 bg-slate-800" role="img" aria-label="User profile" />
+            </div>
           </div>
         </nav>
+      );
+    }
 
-        {/* Main Workspace */}
-        <main className="flex-1 p-4 md:p-10">
-          
-          {/* Executive Header */}
-          <header className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 mb-10 border-b border-slate-800/50 pb-8">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest border border-emerald-500/20">
-                  <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> Verified Status
-                </span>
-                <span className="text-slate-600 text-[10px] font-bold uppercase tracking-widest">Property ID: AZ-4429</span>
-              </div>
-              <h1 className="text-3xl md:text-5xl font-black text-white tracking-tighter leading-none">
-                Azure Grand Resort <span className="text-slate-700">&amp; Spa</span>
-              </h1>
-            </div>
-            
-            <div className="flex items-center gap-3 w-full sm:w-auto">
-              <div className="hidden lg:block text-right pr-6 border-r border-slate-800">
-                <p className="text-slate-500 text-[9px] font-black uppercase tracking-widest mb-0.5">Market Index</p>
-                <div className="flex items-center gap-2 justify-end">
-                   <TrendingUp size={14} className="text-emerald-400" />
-                   <p className="text-white font-black text-lg">Top 5%</p>
-                </div>
-              </div>
-              <button className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-500 text-white px-6 py-3.5 rounded-xl font-black text-xs shadow-xl shadow-blue-600/10 transition-all uppercase tracking-widest flex items-center justify-center gap-2">
-                Export BI Report <ArrowUpRight size={14} />
-              </button>
-            </div>
-          </header>
+    function Dashboard() {
+      const [activeTab, setActiveTab] = useState('overview');
+      const aggregateScore = useMemo(() => calculateWeightedScore(DIMENSIONS), []);
+      const { integerPart, decimalPart } = formatScoreParts(aggregateScore);
+      const scoreLabel = aggregateScore >= 85 ? 'Leadership' : aggregateScore >= 70 ? 'Advanced Practitioner' : aggregateScore >= 50 ? 'Improvement Required' : 'At Risk';
 
-          {/* Primary Business Grid */}
-          <div className="grid grid-cols-12 gap-6 mb-8">
-            
-            {/* Tier Status & Progression */}
-            <GlassCard className="col-span-12 lg:col-span-5 bg-gradient-to-br from-slate-900 to-slate-950" title="Tier Performance" badge="Leadership Target">
-              <div className="flex justify-between items-end mb-8">
-                <div>
-                  <h2 className="text-3xl font-black text-white uppercase tracking-tight">Level 02</h2>
-                  <p className="text-blue-400 font-bold text-[10px] uppercase tracking-widest">Advanced Practitioner</p>
-                </div>
-                <div className="text-right">
-                  <div className="text-5xl font-black text-white leading-none">74<span className="text-slate-700 text-2xl">.2</span></div>
-                  <p className="text-slate-500 text-[9px] font-bold uppercase">Aggregate Score</p>
-                </div>
-              </div>
+      return (
+        <div className="min-h-screen bg-slate-950 text-slate-200 selection:bg-blue-500/30">
+          <div className="flex min-h-screen flex-col md:flex-row">
+            <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-              <div className="grid grid-cols-3 gap-4 py-6 border-y border-slate-800/50">
-                <KPIMetric label="Revenue Lift" value="+12" trend={4.2} suffix="%" />
-                <KPIMetric label="Guest Sentiment" value="4.9" trend={1.1} suffix="/5" />
-                <KPIMetric label="Direct Bookings" value="2.4" trend={-0.5} suffix="k" />
-              </div>
-
-              <div className="mt-8">
-                <div className="flex justify-between text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">
-                  <span>Leadership Progression</span>
-                  <span className="text-emerald-400">Next Audit: 22 Days</span>
-                </div>
-                <div className="h-2 w-full bg-slate-800/50 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-blue-600 to-emerald-400" style={{ width: '74%' }}></div>
-                </div>
-              </div>
-            </GlassCard>
-
-            {/* Commercial Data Visual */}
-            <GlassCard className="col-span-12 lg:col-span-7" title="Eco-Revenue Correlation" subtitle="Correlation between certification compliance and luxury booking revenue">
-               <div className="h-[280px] w-full mt-2">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={PERFORMANCE_TREND}>
-                      <defs>
-                        <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
-                          <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                      <XAxis dataKey="month" stroke="#475569" fontSize={10} axisLine={false} tickLine={false} />
-                      <YAxis stroke="#475569" fontSize={10} axisLine={false} tickLine={false} />
-                      <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px' }} />
-                      <Area type="monotone" dataKey="revenue" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorRev)" />
-                      <Area type="monotone" dataKey="compliance" stroke="#10b981" strokeWidth={2} fillOpacity={0} />
-                    </AreaChart>
-                  </ResponsiveContainer>
-               </div>
-            </GlassCard>
-          </div>
-
-          {/* Operational Details */}
-          <div className="grid grid-cols-12 gap-6">
-            
-            {/* KPI Matrix */}
-            <div className="col-span-12 xl:col-span-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {DIMENSIONS.map((dim) => (
-                <GlassCard key={dim.id} className="relative group overflow-hidden">
-                  <div className="absolute top-0 right-0 w-16 h-16 bg-blue-500/5 rounded-full blur-2xl group-hover:bg-blue-500/10 transition-colors"></div>
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-blue-400 group-hover:scale-110 transition-all">
-                       <dim.icon size={18} />
-                    </div>
-                    <div>
-                      <h4 className="text-white font-bold text-xs tracking-tight">{dim.name}</h4>
-                      <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">WGT: {dim.weight}%</p>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-end">
-                    <span className="text-3xl font-black text-white">{dim.score}%</span>
-                    <div className="flex flex-col items-end">
-                       <span className={`text-[9px] font-bold ${dim.score > 50 ? 'text-emerald-400' : 'text-amber-400'}`}>
-                         {dim.score > 80 ? 'EXEMPT' : 'OPTIMIZING'}
-                       </span>
-                    </div>
-                  </div>
-                  <div className="mt-4 h-1 w-full bg-slate-800/50 rounded-full overflow-hidden">
-                    <div className="h-full bg-blue-500 rounded-full" style={{ width: `${dim.score}%`, backgroundColor: dim.color }}></div>
-                  </div>
-                </GlassCard>
-              ))}
-            </div>
-
-            {/* Audit Tracking */}
-            <GlassCard className="col-span-12 xl:col-span-4" title="Assurance Queue" icon={ClipboardCheck}>
-               <div className="space-y-6">
-                  {AUDIT_LOG.map((item, i) => (
-                    <div key={i} className="flex gap-4">
-                       <div className="flex flex-col items-center pt-1">
-                          <div className={`w-2 h-2 rounded-full ${item.status === 'completed' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-slate-700'}`}></div>
-                          {i !== AUDIT_LOG.length - 1 && <div className="w-px h-full bg-slate-800 my-2"></div>}
-                       </div>
-                       <div className="flex-1 pb-4">
-                          <p className="text-white font-bold text-xs tracking-tight">{item.title}</p>
-                          <div className="flex items-center justify-between mt-1">
-                             <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{item.date}</span>
-                             <span className="text-[9px] font-bold text-slate-600 bg-slate-800/40 px-1.5 py-0.5 rounded italic">{item.user}</span>
-                          </div>
-                       </div>
-                    </div>
-                  ))}
-               </div>
-               <button className="w-full mt-2 py-3 bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 rounded-xl text-[9px] font-black text-slate-300 tracking-[0.2em] uppercase transition-all">
-                  Request Interim Audit
-               </button>
-            </GlassCard>
-
-            {/* Commercial Upsell / Tier Action */}
-            <div className="col-span-12 relative rounded-3xl overflow-hidden mt-2 p-8 md:p-14 bg-gradient-to-r from-blue-700 to-indigo-900 shadow-2xl group">
-               <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20 pointer-events-none"></div>
-               <div className="absolute top-0 right-0 w-[40%] h-full bg-white/5 skew-x-[30deg] translate-x-20"></div>
-               
-               <div className="relative z-10 flex flex-col xl:flex-row justify-between items-center gap-12">
-                  <div className="max-w-2xl text-center xl:text-left">
-                     <div className="flex items-center justify-center xl:justify-start gap-2 mb-6">
-                        <Zap size={20} className="text-amber-400 fill-amber-400" />
-                        <span className="text-amber-400 font-black text-[10px] uppercase tracking-[0.4em]">Sales Optimization</span>
-                     </div>
-                     <h3 className="text-3xl md:text-5xl font-black text-white tracking-tighter mb-6 leading-[1.1]">
-                        Activate Leadership Tier <br/> 
-                        <span className="text-blue-200/50">Increase Direct Channel ROI.</span>
-                     </h3>
-                     <p className="text-blue-100/70 text-lg font-medium leading-relaxed mb-4">
-                        Properties reaching the "Leadership" threshold unlock direct API feeds to OTAs like Booking.com, surfacing your "Nature Positive" credentials to 2.4M monthly eco-conscious travelers.
-                     </p>
-                  </div>
-                  <div className="flex flex-col gap-4 w-full sm:w-auto min-w-[280px]">
-                     <button className="bg-white text-blue-900 px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest shadow-2xl transition-all hover:scale-105 active:scale-95">
-                        Upgrade Certification
-                     </button>
-                     <button className="bg-blue-950/40 text-white border border-white/10 px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-950/60 transition-all flex items-center justify-center gap-2">
-                        Commercial Insights <HelpCircle size={14} />
-                       </button>
-                  </div>
-               </div>
-               <Award size={300} className="absolute -bottom-20 -right-20 text-white/5 rotate-[20deg] pointer-events-none group-hover:scale-110 transition-transform duration-1000" />
-            </div>
-
-          </div>
-
-          <footer className="mt-20 text-center border-t border-slate-800/50 pt-10 pb-10">
-            <p className="text-slate-600 text-[9px] font-black uppercase tracking-[0.5em]">
-              TFC Ecosystem • Powered by Biodiversity Data Hub • v2.4.1
-            </p>
-          </footer>
-        </main>
-      </div>
-    </div>
-  );
-};
-
-export default App;
+            <main className="flex-1 p-4 md:p-10">
+              <header className="mb-10 flex flex-col items-start justify-between gap-6 border-b border-slate-800/50 pb-8 xl:flex-row xl:items-center">
