@@ -1,0 +1,336 @@
+import React, { useState, useMemo } from 'react';
+import { 
+  Shield, 
+  Moon, 
+  Sun, 
+  Camera, 
+  ClipboardCheck, 
+  BarChart3, 
+  AlertTriangle, 
+  CheckCircle2, 
+  ChevronRight, 
+  LayoutDashboard, 
+  Waves, 
+  FileText,
+  HelpCircle
+} from 'lucide-react';
+import { 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer, 
+  AreaChart, 
+  Area
+} from 'recharts';
+
+// --- MOCK DATA ---
+const DIMENSIONS = [
+  { id: 'd1', name: 'Protection & Habitat', weight: 30, score: 65, color: '#3b82f6', icon: Waves },
+  { id: 'd2', name: 'Ops & Infrastructure', weight: 20, score: 85, color: '#10b981', icon: Shield },
+  { id: 'd3', name: 'Guest Experience', weight: 15, score: 40, color: '#f59e0b', icon: Camera },
+  { id: 'd4', name: 'Community Engagement', weight: 15, score: 20, color: '#8b5cf6', icon: ClipboardCheck },
+  { id: 'd5', name: 'Monitoring & Data', weight: 10, score: 90, color: '#ec4899', icon: BarChart3 },
+  { id: 'd6', name: 'Governance', weight: 10, score: 100, color: '#06b6d4', icon: FileText },
+];
+
+const TREND_DATA = [
+  { month: 'Jan', score: 45, nests: 12 },
+  { month: 'Feb', score: 48, nests: 15 },
+  { month: 'Mar', score: 55, nests: 28 },
+  { month: 'Apr', score: 62, nests: 45 },
+  { month: 'May', score: 71, nests: 82 },
+  { month: 'Jun', score: 74, nests: 95 },
+];
+
+const ALERTS = [
+  { id: 1, type: 'critical', title: 'Light Leak Detected', location: 'Beach Wing B', time: '2h ago' },
+  { id: 2, type: 'warning', title: 'Furniture Log Missing', location: 'West Terrace', time: '5h ago' },
+];
+
+// --- REUSABLE COMPONENTS ---
+
+const Card = ({ children, className = "" }) => (
+  <div className={`bg-slate-900/40 border border-slate-800 rounded-2xl p-6 backdrop-blur-md transition-all hover:border-slate-700 ${className}`}>
+    {children}
+  </div>
+);
+
+const Badge = ({ children, type = "default" }) => {
+  const styles = {
+    critical: "bg-red-500/10 text-red-500 border-red-500/20",
+    warning: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+    success: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+    default: "bg-slate-500/10 text-slate-400 border-slate-500/20"
+  };
+  return (
+    <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${styles[type]}`}>
+      {children}
+    </span>
+  );
+};
+
+const Navigation = ({ activeTab, setActiveTab }) => (
+  <nav className="fixed left-0 top-0 h-full w-20 bg-slate-950 border-r border-slate-800 flex flex-col items-center py-8 z-50">
+    <div className="mb-12 text-blue-500">
+      <Shield size={32} fill="currentColor" fillOpacity={0.2} />
+    </div>
+    <div className="flex flex-col gap-8 flex-1">
+      {[
+        { id: 'dash', icon: LayoutDashboard },
+        { id: 'audit', icon: ClipboardCheck },
+        { id: 'data', icon: BarChart3 },
+        { id: 'reports', icon: FileText }
+      ].map((item) => (
+        <button 
+          key={item.id}
+          onClick={() => setActiveTab(item.id)}
+          className={`p-3 rounded-xl transition-all duration-200 group relative ${activeTab === item.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'text-slate-500 hover:text-slate-300'}`}
+        >
+          <item.icon size={24} />
+          {activeTab === item.id && (
+            <span className="absolute left-full ml-4 px-2 py-1 bg-blue-600 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity">
+              {item.id.toUpperCase()}
+            </span>
+          )}
+        </button>
+      ))}
+    </div>
+    <div className="mt-auto text-slate-600 hover:text-white transition-colors cursor-pointer">
+      <HelpCircle size={24} />
+    </div>
+  </nav>
+);
+
+const App = () => {
+  const [activeTab, setActiveTab] = useState('dash');
+  const [isNightMode, setIsNightMode] = useState(true);
+  
+  const totalScore = useMemo(() => {
+    return Math.round(DIMENSIONS.reduce((acc, dim) => acc + (dim.score * (dim.weight / 100)), 0));
+  }, []);
+
+  const tier = useMemo(() => {
+    if (totalScore >= 85) return { name: 'Leadership', badge: 'success', text: 'text-emerald-400' };
+    if (totalScore >= 60) return { name: 'Advanced', badge: 'default', text: 'text-blue-400' };
+    return { name: 'Verified', badge: 'default', text: 'text-slate-400' };
+  }, [totalScore]);
+
+  return (
+    <div className={`min-h-screen ${isNightMode ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'} transition-colors duration-500 flex selection:bg-blue-500/30`}>
+      <Navigation activeTab={activeTab} setActiveTab={setActiveTab} />
+      
+      <main className="ml-20 flex-1 p-8 lg:p-12 overflow-y-auto">
+        {/* Header */}
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-slate-500 uppercase tracking-[0.2em] text-[10px] font-black">Digital Registry</span>
+              <div className="w-1 h-1 rounded-full bg-blue-500 animate-pulse"></div>
+              <span className="text-blue-500 text-[10px] font-black tracking-widest">RESORT ID: TFC-0042</span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-black tracking-tight leading-none">The Azure Grand Resort</h1>
+          </div>
+          
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <button 
+              onClick={() => setIsNightMode(!isNightMode)}
+              className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs font-bold hover:border-blue-500/50 transition-all shadow-xl"
+            >
+              {isNightMode ? <Sun size={16} className="text-amber-400" /> : <Moon size={16} className="text-blue-400" />}
+              {isNightMode ? "Day Mode" : "Night Mode"}
+            </button>
+            <button className="flex-1 md:flex-none px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black shadow-xl shadow-blue-600/20 active:scale-95 transition-all">
+              START SEASON AUDIT
+            </button>
+          </div>
+        </header>
+
+        {/* Dashboard Grid */}
+        <div className="grid grid-cols-12 gap-6">
+          
+          {/* Main Score & Tier */}
+          <Card className="col-span-12 lg:col-span-4 flex flex-col justify-between group overflow-hidden bg-gradient-to-b from-slate-900/60 to-slate-950/60">
+            <div className="relative z-10">
+              <div className="flex justify-between items-start mb-8">
+                <h3 className="text-slate-500 font-black uppercase text-[10px] tracking-[0.15em]">Overall Compliance Index</h3>
+                <Badge type={tier.badge}>{tier.name}</Badge>
+              </div>
+              <div className="flex items-baseline gap-3 mb-4">
+                <span className="text-8xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white to-slate-500 leading-none">
+                  {totalScore}
+                </span>
+                <span className="text-slate-600 text-2xl font-bold">/100</span>
+              </div>
+              <p className="text-slate-400 text-sm font-medium leading-relaxed max-w-[240px]">
+                Targeting <span className="text-blue-400 font-bold">Leadership Tier</span>. Resolve 2 critical habitat gaps to progress.
+              </p>
+            </div>
+
+            <div className="mt-12 space-y-4 relative z-10">
+               <div className="w-full h-2 bg-slate-800/50 rounded-full overflow-hidden border border-slate-800">
+                  <div 
+                    className="h-full bg-gradient-to-r from-blue-600 via-blue-400 to-emerald-400 rounded-full transition-all duration-1000 ease-out" 
+                    style={{ width: `${totalScore}%` }}
+                  />
+               </div>
+               <div className="flex justify-between text-[9px] font-black text-slate-600 uppercase tracking-widest">
+                 <span>Baseline</span>
+                 <span>Verified</span>
+                 <span className="text-blue-500">Advanced</span>
+                 <span>Leadership</span>
+               </div>
+            </div>
+            
+            <Shield size={180} className="absolute -bottom-10 -right-10 text-slate-800/10 group-hover:text-blue-500/5 group-hover:scale-110 transition-all duration-700 pointer-events-none" />
+          </Card>
+
+          {/* Activity Chart */}
+          <Card className="col-span-12 lg:col-span-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+              <div>
+                <h3 className="font-black text-xl tracking-tight">Ecology Performance Correlation</h3>
+                <p className="text-slate-500 text-xs">Sustainability Index vs. Nesting Success (Real-time)</p>
+              </div>
+              <div className="flex gap-6">
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">TFC Score</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Nests</span>
+                </div>
+              </div>
+            </div>
+            <div className="h-[280px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={TREND_DATA} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} opacity={0.5} />
+                  <XAxis dataKey="month" stroke="#475569" fontSize={10} fontWeight="bold" tickLine={false} axisLine={false} />
+                  <YAxis stroke="#475569" fontSize={10} fontWeight="bold" tickLine={false} axisLine={false} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', fontSize: '12px' }}
+                    itemStyle={{ padding: '2px 0' }}
+                  />
+                  <Area type="monotone" dataKey="score" stroke="#3b82f6" strokeWidth={4} fillOpacity={1} fill="url(#colorScore)" animationDuration={2000} />
+                  <Area type="monotone" dataKey="nests" stroke="#10b981" strokeWidth={4} fillOpacity={0} animationDuration={2500} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
+
+          {/* Dimension Breakdown */}
+          <div className="col-span-12 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {DIMENSIONS.map((dim) => (
+              <Card key={dim.id} className="p-5 flex flex-col items-center text-center group cursor-pointer border-slate-800/50 hover:bg-slate-800/20">
+                <div className="p-3.5 rounded-2xl bg-slate-950 mb-4 transition-transform group-hover:scale-110 group-hover:rotate-3 shadow-inner" style={{ color: dim.color }}>
+                  <dim.icon size={28} />
+                </div>
+                <h4 className="text-[9px] uppercase font-black text-slate-500 tracking-[0.1em] mb-1 line-clamp-1">{dim.name}</h4>
+                <div className="text-2xl font-black tracking-tighter">{dim.score}%</div>
+                <div className="w-full mt-5 h-1 bg-slate-800/50 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full rounded-full transition-all duration-1000" 
+                    style={{ width: `${dim.score}%`, backgroundColor: dim.color }} 
+                  />
+                </div>
+              </Card>
+            ))}
+          </div>
+
+          {/* Alerts & Critical Issues */}
+          <Card className="col-span-12 lg:col-span-7 flex flex-col">
+            <div className="flex justify-between items-center mb-8">
+              <div>
+                <h3 className="font-black text-xl tracking-tight flex items-center gap-2">
+                  <AlertTriangle className="text-amber-500" size={24} />
+                  Operations Sentinel
+                </h3>
+                <p className="text-slate-500 text-xs">Real-time risk monitoring & response</p>
+              </div>
+              <button className="text-[10px] font-black uppercase text-blue-500 tracking-widest hover:text-blue-400 transition-colors">Resolve All</button>
+            </div>
+            <div className="space-y-4 flex-1">
+              {ALERTS.map((alert) => (
+                <div key={alert.id} className="flex items-center gap-5 p-5 rounded-2xl bg-slate-950/40 border border-slate-800/50 hover:border-blue-500/30 transition-all group cursor-pointer">
+                  <div className={`p-3 rounded-xl ${alert.type === 'critical' ? 'bg-red-500/10 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.1)]' : 'bg-amber-500/10 text-amber-500'}`}>
+                    <AlertTriangle size={24} />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-0.5">
+                       <h4 className="font-bold text-sm text-slate-200">{alert.title}</h4>
+                       <span className="text-[8px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-black uppercase tracking-tighter">Live</span>
+                    </div>
+                    <p className="text-xs text-slate-500 font-medium">{alert.location} • <span className="text-slate-400">{alert.time}</span></p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <button className="hidden group-hover:block text-[10px] font-black text-blue-500 uppercase tracking-widest">Remediate</button>
+                    <ChevronRight size={18} className="text-slate-700 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
+                  </div>
+                </div>
+              ))}
+              <div className="flex items-center gap-5 p-5 rounded-2xl bg-slate-900/20 border border-slate-800/30 opacity-60">
+                <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-500">
+                  <CheckCircle2 size={24} />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-bold text-sm">Furniture Log Verified</h4>
+                  <p className="text-xs text-slate-500 font-medium">Main Beach • Automated Verification</p>
+                </div>
+                <Badge type="success">Verified</Badge>
+              </div>
+            </div>
+          </Card>
+
+          {/* Commercial CTA / Upgrade */}
+          <Card className="col-span-12 lg:col-span-5 bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-800 border-none relative overflow-hidden flex flex-col justify-center p-10 min-h-[350px]">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-32 -mt-32"></div>
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-400/20 rounded-full blur-3xl -ml-24 -mb-24"></div>
+            
+            <div className="relative z-10">
+              <div className="inline-block px-3 py-1 bg-white/10 backdrop-blur-md rounded-lg text-[10px] font-black tracking-widest text-white mb-6 uppercase border border-white/20">
+                Premium Asset
+              </div>
+              <h3 className="text-4xl font-black text-white mb-4 leading-tight tracking-tighter">Scale Your <br />Nature Impact.</h3>
+              <p className="text-blue-50 text-base font-medium mb-8 max-w-sm leading-relaxed opacity-90">
+                Unlock automated OTA synchronization, advanced biodiversity reporting, and our premium "Leadership" marketing engine.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button className="px-8 py-4 bg-white text-blue-900 font-black rounded-2xl text-sm hover:scale-105 transition-all shadow-2xl active:scale-95">
+                  UPGRADE TO LEADERSHIP
+                </button>
+                <button className="px-8 py-4 bg-transparent text-white font-bold rounded-2xl text-sm border border-white/30 hover:bg-white/10 transition-all">
+                  Request Demo
+                </button>
+              </div>
+            </div>
+
+            <Waves size={300} strokeWidth={0.5} className="absolute -bottom-20 -right-20 text-white/5 rotate-12 pointer-events-none" />
+          </Card>
+
+        </div>
+
+        {/* Footer Info */}
+        <footer className="mt-16 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-6 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+            <span className="hover:text-white cursor-pointer transition-colors">Terms of Service</span>
+            <span className="hover:text-white cursor-pointer transition-colors">Privacy Policy</span>
+            <span className="hover:text-white cursor-pointer transition-colors">Audit Methodology</span>
+          </div>
+          <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em]">
+            © 2024 TFC Digital Ecosystem • All Rights Reserved
+          </p>
+        </footer>
+      </main>
+    </div>
+  );
+};
+
+export default App;
